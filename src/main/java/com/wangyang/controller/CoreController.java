@@ -1,5 +1,7 @@
 package com.wangyang.controller;
 
+import com.wangyang.service.CoreService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import javax.servlet.http.HttpServletRequest;
@@ -7,7 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.*;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
 import com.wangyang.utils.SignUtil;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * Created by wy on 2016/8/3.
@@ -15,20 +20,26 @@ import com.wangyang.utils.SignUtil;
 @Controller
 public class CoreController {
 
-    @RequestMapping(value = "/core")
+    @Autowired
+    private CoreService coreService;
+
+    @RequestMapping(value = "/core", method = RequestMethod.GET)
     public void check(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        // Î¢ĞÅ¼ÓÃÜÇ©Ãû
+        // å¾®ä¿¡åŠ å¯†ç­¾å
         String signature = request.getParameter("signature");
-        // Ê±¼ä´Á
-        String timestamp = request.getParameter("timestamp ");
-        // Ëæ»úÊı
-        String nonce = request.getParameter("nonce ");
-        // Ëæ»ú×Ö·û´®
+        // æ—¶é—´æˆ³
+        String timestamp = request.getParameter("timestamp");
+        // éšæœºæ•°
+        String nonce = request.getParameter("nonce");
+        // éšæœºå­—ç¬¦ä¸²
         String echostr = request.getParameter("echostr");
+
+        System.out.println("========from weixin server===== echostr:" + echostr + " signature:" + signature + " timestamp" + timestamp
+                + " nonce" + nonce);
 
         PrintWriter out = response.getWriter();
 
-        // Í¨¹ı¼ìÑésignature¶ÔÇëÇó½øĞĞĞ£Ñé£¬ÈôĞ£Ñé³É¹¦ÔòÔ­Ñù·µ»Øechostr£¬±íÊ¾½ÓÈë³É¹¦£¬·ñÔò½ÓÈëÊ§°Ü
+        // é€šè¿‡æ£€éªŒsignatureå¯¹è¯·æ±‚è¿›è¡Œæ ¡éªŒï¼Œè‹¥æ ¡éªŒæˆåŠŸåˆ™åŸæ ·è¿”å›echostrï¼Œè¡¨ç¤ºæ¥å…¥æˆåŠŸï¼Œå¦åˆ™æ¥å…¥å¤±è´¥
         if (SignUtil.checkSignature(signature, timestamp, nonce)) {
 
             out.print(echostr);
@@ -39,4 +50,22 @@ public class CoreController {
 
         out = null;
     }
+
+    @RequestMapping(value = "/core", method = RequestMethod.POST)
+    public void process(HttpServletRequest request, HttpServletResponse response) throws IOException {
+
+        // å°†è¯·æ±‚ã€å“åº”çš„ç¼–ç å‡è®¾ç½®ä¸ºUTF-8ï¼ˆé˜²æ­¢ä¸­æ–‡ä¹±ç ï¼‰
+        request.setCharacterEncoding("UTF-8");
+        response.setCharacterEncoding("UTF-8");
+
+        // è°ƒç”¨æ ¸å¿ƒä¸šåŠ¡ç±»æ¥æ”¶æ¶ˆæ¯ã€å¤„ç†æ¶ˆæ¯
+        String respMessage = coreService.processRequest(request);
+
+        // å“åº”æ¶ˆæ¯
+        PrintWriter out = response.getWriter();
+        out.print(respMessage);
+        out.close();
+    }
+
+
 }

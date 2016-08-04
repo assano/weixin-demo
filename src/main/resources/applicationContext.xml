@@ -26,6 +26,8 @@
         <property name="forceEncoding" value="true" />
     </bean>
 
+
+
     <!-- configure the InternalResourceViewResolver -->
     <!--<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver"-->
           <!--id="internalResourceViewResolver">-->
