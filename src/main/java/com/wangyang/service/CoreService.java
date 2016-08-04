@@ -45,9 +45,8 @@ public class CoreService {
 
             // 文本消息
             if (msgType.equals(MessageUtil.REQ_MESSAGE_TYPE_TEXT)) {
-                System.out.println("====" + requestMap.get("Content"));
                 if ("帮助".equals(requestMap.get("Content"))) {
-                    respContent = "回复数字使用该功能\n"
+                    respContent = "回复数字使用相应功能\n"
                             + "1.查询天气\n"
                             + "2.查看地图\n"
                             + "3.听音乐";
